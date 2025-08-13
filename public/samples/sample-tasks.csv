@@ -1,0 +1,9 @@
+TaskID,TaskName,Category,Duration,RequiredSkills,PreferredPhases,MaxConcurrent
+T001,Frontend Development,Development,2,"JavaScript,React,UI/UX","[1,2,3]",2
+T002,Backend API Development,Development,3,"Python,Django,Node.js","[2,3,4]",2
+T003,Database Design,Architecture,1,"Data Analysis,Database Design","[1,2]",1
+T004,DevOps Setup,Infrastructure,2,"DevOps,AWS,Docker","[3,4,5]",1
+T005,Machine Learning Model,AI/ML,4,"Machine Learning,Python,TensorFlow","[2,3,4,5]",1
+T006,Project Planning,Management,1,"Project Management,Agile,Scrum","[1,2]",2
+T007,UI/UX Design,Design,2,"UI/UX,Design Systems,Prototyping","[1,2,3]",2
+T008,Testing & QA,Quality,1,"JavaScript,Python,Testing","[4,5,6]",3

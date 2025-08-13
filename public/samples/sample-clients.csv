@@ -1,0 +1,6 @@
+ClientID,ClientName,PriorityLevel,RequestedTaskIDs,GroupTag,AttributesJSON
+C001,Acme Corporation,1,"T001,T002,T003",Enterprise,{"industry": "technology", "region": "north", "contractValue": 500000}
+C002,Global Solutions Inc,2,"T002,T004",Enterprise,{"industry": "consulting", "region": "south", "contractValue": 300000}
+C003,Startup Ventures,3,"T001,T005",Startup,{"industry": "fintech", "region": "east", "contractValue": 100000}
+C004,Local Business Co,4,"T003",SMB,{"industry": "retail", "region": "west", "contractValue": 50000}
+C005,Innovation Labs,2,"T004,T005,T006",Enterprise,{"industry": "research", "region": "central", "contractValue": 400000}
