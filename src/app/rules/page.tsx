@@ -41,27 +41,50 @@ export default function RulesPage() {
 
   // AI Convert natural language to rule
   const handleAIConvert = async () => {
+    if (!nlInput.trim()) return;
+    
     setAiLoading(true);
     setAiError(null);
+    
     try {
-      // Compose context for AI
-      const taskIDs = tasks.map(t => t.TaskID).join(", ");
-      const ruleTypes = "coRun, phaseWindow";
-      // Example prompt: Convert to rule JSON: [user input]. Context: Tasks [list IDs], Rule types: [coRun, etc.]
-      // const response = await openai.createChatCompletion(...)
-      // For now, mock a coRun rule if input contains 'run together' and T1/T2
-      let rule = null;
-      if (nlInput.toLowerCase().includes("run together") && nlInput.match(/t1/i) && nlInput.match(/t2/i)) {
-        rule = { type: "coRun", tasks: ["T1", "T2"] } as CoRunRule;
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generateRule',
+          description: nlInput,
+          dataContext: { tasks, rules }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`AI service failed: ${response.status}`);
       }
-      if (rule) {
-        setRules([...rules, rule]);
-        setNlInput("");
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        const aiRule = result.data;
+        
+        // Convert AI rule to our format
+        let newRule: Rule | null = null;
+        
+        if (aiRule.type === 'coRun' && aiRule.parameters?.tasks) {
+          newRule = { type: "coRun", tasks: aiRule.parameters.tasks };
+        } else if (aiRule.type === 'phaseWindow' && aiRule.parameters?.task && aiRule.parameters?.phases) {
+          newRule = { type: "phaseWindow", task: aiRule.parameters.task, phases: aiRule.parameters.phases };
+        }
+        
+        if (newRule) {
+          setRules([...rules, newRule]);
+          setNlInput("");
+        } else {
+          setAiError('Could not convert AI rule to supported format');
+        }
       } else {
-        setAiError("Could not parse rule from input.");
+        setAiError('Failed to generate rule from description');
       }
-    } catch (err: unknown) {
-      setAiError("AI conversion failed");
+    } catch (error) {
+      setAiError(error instanceof Error ? error.message : 'AI conversion failed');
     } finally {
       setAiLoading(false);
     }
