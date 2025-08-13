@@ -7,11 +7,26 @@ import { ClientSchema } from "../../types/client";
 import { WorkerSchema } from "../../types/worker";
 import { TaskSchema } from "../../types/task";
 import { runAllValidations, ValidationError } from "../../lib/validators";
-import { 
-  advancedErrorCorrection,
-  mockAdvancedErrorCorrection,
-  type AIResponse 
-} from "../../lib/ai-service";
+// AI service functions
+const callAIService = async (action: string, params: any) => {
+  try {
+    const response = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...params }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`AI service failed: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    return result.success ? result.data : null;
+  } catch (error) {
+    console.error(`AI ${action} failed:`, error);
+    return null;
+  }
+};
 
 export default function UploadPage() {
   const { clients, workers, tasks, rules, setClients, setWorkers, setTasks, setErrors } = useData();
@@ -192,16 +207,16 @@ export default function UploadPage() {
     setShowAiCorrections(false);
     
     try {
-      let aiResponse: AIResponse;
+      const errorMessages = validationErrors.map(e => e.message);
+      const allData = [...clients, ...workers, ...tasks];
       
-      if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your-api-key-here') {
-        aiResponse = await advancedErrorCorrection(validationErrors, { clients, workers, tasks });
-      } else {
-        aiResponse = mockAdvancedErrorCorrection();
-      }
+      const suggestions = await callAIService('suggestCorrections', {
+        data: allData,
+        errors: errorMessages
+      });
       
-      if (aiResponse.success && aiResponse.data?.suggestions) {
-        setAiCorrections(aiResponse.data.suggestions);
+      if (suggestions && Array.isArray(suggestions)) {
+        setAiCorrections({ suggestions });
         setShowAiCorrections(true);
       }
     } catch (error) {

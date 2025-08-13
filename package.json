@@ -11,8 +11,10 @@
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
     "autoprefixer": "^10.4.21",
+    "axios": "^1.11.0",
     "lodash": "^4.17.21",
     "next": "15.4.6",
+    "node-fetch": "^2.7.0",
     "openai": "^5.12.2",
     "papaparse": "^5.5.3",
     "postcss": "^8.5.6",
